@@ -1,0 +1,400 @@
+import { useState, useMemo, useRef, useEffect } from "react";
+
+const raw = [
+  { id: 9827, name: "FabHotel Spiro Grand - Nr. Banashankari", city: "Bangalore", compRns: 53.8, fhFebVisits: 161, compFebVisits: 990.2, fhJanVisits: 1158, compJanVisits: 471.8, fhJanRev: 1.61, compJanRev: 1.76, fhFebRev: 2.25, compFebRev: 2.30, fhJanConv: 3.2, compJanConv: 1.4, fhFebConv: 4.35, compFebConv: 2.91 },
+  { id: 8637, name: "FabHotel Carnival - Nr. Irony Market, Newtown", city: "Kolkata", compRns: 3.6, fhFebVisits: 167, compFebVisits: 149, fhJanVisits: 11, compJanVisits: 4.83, fhJanRev: 1.99, compJanRev: 0.51, fhFebRev: 0.67, compFebRev: 0.19, fhJanConv: 0, compJanConv: 3.45, fhFebConv: 1.2, compFebConv: 1.61 },
+  { id: 8456, name: "FabHotel Amaltas", city: "Ranchi", compRns: 7.17, fhFebVisits: 251, compFebVisits: 147.33, fhJanVisits: 1086, compJanVisits: 505.83, fhJanRev: 1.28, compJanRev: 0.03, fhFebRev: 1.01, compFebRev: 0.24, fhJanConv: 3.5, compJanConv: 1.61, fhFebConv: 4.78, compFebConv: 2.38 },
+  { id: 7848, name: "FabHotel Eros 211 - Nr. Sreebhumi", city: "Kolkata", compRns: 11.83, fhFebVisits: 445, compFebVisits: 258.5, fhJanVisits: 1476, compJanVisits: 2553.2, fhJanRev: 5.84, compJanRev: 0.15, fhFebRev: 3.15, compFebRev: 0.33, fhJanConv: 2.71, compJanConv: 0.86, fhFebConv: 2.92, compFebConv: 2.9 },
+  { id: 7594, name: "FabHotel La Paz Stay B&B", city: "New Delhi", compRns: 24.6, fhFebVisits: 361, compFebVisits: 1448, fhJanVisits: 371, compJanVisits: 692.6, fhJanRev: 6.72, compJanRev: 1.05, fhFebRev: 6.22, compFebRev: 1.40, fhJanConv: 1.08, compJanConv: 4.01, fhFebConv: 3.6, compFebConv: 0.99 },
+  { id: 7088, name: "Via Ganpati 2", city: "Siliguri", compRns: 24.6, fhFebVisits: 96, compFebVisits: 351.2, fhJanVisits: 534, compJanVisits: 1047.2, fhJanRev: 0.06, compJanRev: 0.88, fhFebRev: 0, compFebRev: 0.94, fhJanConv: 0.75, compJanConv: 0.4, fhFebConv: 0, compFebConv: 4.73 },
+  { id: 7056, name: "FabHotel Prime Empire", city: "Amritsar", compRns: 1.6, fhFebVisits: 232, compFebVisits: 521.4, fhJanVisits: null, compJanVisits: null, fhJanRev: 1.11, compJanRev: 0.09, fhFebRev: 0.33, compFebRev: 0.06, fhJanConv: 0, compJanConv: 0, fhFebConv: 3.02, compFebConv: 0.23 },
+  { id: 6939, name: "Via Shreyas Inn", city: "Bangalore", compRns: 61, fhFebVisits: 269, compFebVisits: 795.4, fhJanVisits: 2966, compJanVisits: 1977.2, fhJanRev: 2.2, compJanRev: 2.42, fhFebRev: 2.65, compFebRev: 2.38, fhJanConv: 4.62, compJanConv: 2.61, fhFebConv: 4.09, compFebConv: 3.09 },
+  { id: 6792, name: "FabHotel Nestlay Rooms Airport", city: "Chennai", compRns: 43, fhFebVisits: 941, compFebVisits: 964.8, fhJanVisits: 563, compJanVisits: 4109.6, fhJanRev: 9.95, compJanRev: 1.69, fhFebRev: 9.64, compFebRev: 2.10, fhJanConv: 1.42, compJanConv: 0.24, fhFebConv: 4.78, compFebConv: 3.23 },
+  { id: 6726, name: "FabHotel Exotica", city: "New Delhi", compRns: 2.4, fhFebVisits: 310, compFebVisits: 1925.4, fhJanVisits: 1364, compJanVisits: 4448.4, fhJanRev: 1.36, compJanRev: 0.44, fhFebRev: 2.59, compFebRev: 0.16, fhJanConv: 0.73, compJanConv: 1.28, fhFebConv: 2.58, compFebConv: 0.08 },
+  { id: 6641, name: "FabHotel Sholas Residency I", city: "Ooty", compRns: 37, fhFebVisits: 302, compFebVisits: 1987.6, fhJanVisits: 44, compJanVisits: 42.6, fhJanRev: 3.04, compJanRev: 2.52, fhFebRev: 1.06, compFebRev: 1.38, fhJanConv: 0, compJanConv: 0.4, fhFebConv: 0.66, compFebConv: 1.04 },
+  { id: 6205, name: "FabHotel Lemon Grass - Nr. Assi Ghat", city: "Varanasi", compRns: 13.8, fhFebVisits: 1063, compFebVisits: 669.6, fhJanVisits: 652, compJanVisits: 421.4, fhJanRev: 2.6, compJanRev: 0.51, fhFebRev: 2.37, compFebRev: 0.55, fhJanConv: 0.31, compJanConv: 1.04, fhFebConv: 2.07, compFebConv: 1.55 },
+  { id: 6161, name: "FabHotel Vagator Retreat Resort", city: "Goa", compRns: 7.6, fhFebVisits: 301, compFebVisits: 208, fhJanVisits: 864, compJanVisits: 1015, fhJanRev: 0.85, compJanRev: 0.22, fhFebRev: 2.01, compFebRev: 0.29, fhJanConv: 4.28, compJanConv: 3.9, fhFebConv: 1.33, compFebConv: 1.54 },
+  { id: 5907, name: "FabHotel Imperio - Nr. Baner Hill", city: "Pune", compRns: 31.4, fhFebVisits: 340, compFebVisits: 435.6, fhJanVisits: 720, compJanVisits: 2131.6, fhJanRev: 4.48, compJanRev: 1.18, fhFebRev: 4.78, compFebRev: 1.13, fhJanConv: 2.36, compJanConv: 2.7, fhFebConv: 3.53, compFebConv: 3.81 },
+  { id: 5759, name: "Via Sri Krishna Suites", city: "Bangalore", compRns: 109.4, fhFebVisits: 249, compFebVisits: 930.4, fhJanVisits: 1784, compJanVisits: 670, fhJanRev: 1.93, compJanRev: 4.58, fhFebRev: 1.19, compFebRev: 5.11, fhJanConv: 0.39, compJanConv: 1.34, fhFebConv: 2.01, compFebConv: 3.25 },
+  { id: 5169, name: "FabHotel Wild Orchid", city: "Kolkata", compRns: 5, fhFebVisits: 1282, compFebVisits: 273.4, fhJanVisits: 146, compJanVisits: 17.6, fhJanRev: 0.59, compJanRev: 0.19, fhFebRev: 0.39, compFebRev: 0.16, fhJanConv: 0.68, compJanConv: 0, fhFebConv: 0.23, compFebConv: 1.32 },
+  { id: 4641, name: "FabHotel P.A.S Residency", city: "Chennai", compRns: 2.4, fhFebVisits: 2058, compFebVisits: 451.4, fhJanVisits: 625, compJanVisits: 1446.17, fhJanRev: 6.78, compJanRev: 0.00, fhFebRev: 6.31, compFebRev: 0.11, fhJanConv: 2.08, compJanConv: 2.16, fhFebConv: 0.44, compFebConv: 0.35 },
+  { id: 4468, name: "Oriva Suvee Boutique", city: "Bangalore", compRns: 24.33, fhFebVisits: 221, compFebVisits: 770.5, fhJanVisits: 2227, compJanVisits: 876.2, fhJanRev: 2.03, compJanRev: 0.80, fhFebRev: 2.46, compFebRev: 0.85, fhJanConv: 2.11, compJanConv: 3.93, fhFebConv: 3.17, compFebConv: 2.49 },
+  { id: 4445, name: "FabHotel SRH", city: "Pune", compRns: 26.6, fhFebVisits: 639, compFebVisits: 336, fhJanVisits: 2144, compJanVisits: 1771.6, fhJanRev: 2.35, compJanRev: 0.91, fhFebRev: 2.56, compFebRev: 0.99, fhJanConv: 4.34, compJanConv: 4.81, fhFebConv: 5.32, compFebConv: 4.7 },
+  { id: 4275, name: "FabHotel Keerthi's Anupama", city: "Vijayawada", compRns: 65.8, fhFebVisits: 581, compFebVisits: 741.8, fhJanVisits: 1595, compJanVisits: 1394.5, fhJanRev: 7.07, compJanRev: 2.31, fhFebRev: 3.71, compFebRev: 2.22, fhJanConv: 3.57, compJanConv: 2.76, fhFebConv: 6.2, compFebConv: 6.39 },
+  { id: 4265, name: "FabHotel Nanda - Nr. Ludhiana Junction", city: "Ludhiana", compRns: 54, fhFebVisits: 480, compFebVisits: 740.33, fhJanVisits: 3071, compJanVisits: 4186, fhJanRev: 2.63, compJanRev: 0.82, fhFebRev: 1.94, compFebRev: 1.83, fhJanConv: 3.97, compJanConv: 1.06, fhFebConv: 4.38, compFebConv: 4.5 },
+  { id: 4256, name: "FabHotel Grand Heritage - Nr. BKC", city: "Mumbai", compRns: 52.6, fhFebVisits: 1381, compFebVisits: 2067.8, fhJanVisits: 2570, compJanVisits: 6569.6, fhJanRev: 10.35, compJanRev: 2.46, fhFebRev: 10.02, compFebRev: 3.09, fhJanConv: 1.4, compJanConv: 2.38, fhFebConv: 4.2, compFebConv: 1.51 },
+  { id: 4192, name: "FabHotel Park Inn - Indiranagar", city: "Bangalore", compRns: 138.4, fhFebVisits: 1033, compFebVisits: 3108, fhJanVisits: 562, compJanVisits: 1549.8, fhJanRev: 9.11, compJanRev: 6.80, fhFebRev: 6.39, compFebRev: 7.01, fhJanConv: 2.31, compJanConv: 2.06, fhFebConv: 2.03, compFebConv: 2.62 },
+  { id: 3660, name: "FabHotel Frazer Suites", city: "Bangalore", compRns: 24, fhFebVisits: 197, compFebVisits: 740.8, fhJanVisits: 871, compJanVisits: 484.83, fhJanRev: 1.72, compJanRev: 1.81, fhFebRev: 2.28, compFebRev: 1.33, fhJanConv: 1.26, compJanConv: 3.44, fhFebConv: 6.6, compFebConv: 1.94 },
+  { id: 3606, name: "FabHotel Naman Palace", city: "Bhopal", compRns: 9.67, fhFebVisits: 198, compFebVisits: 219.5, fhJanVisits: 1273, compJanVisits: 2651, fhJanRev: 1.66, compJanRev: 0.23, fhFebRev: 0.33, compFebRev: 0.24, fhJanConv: 6.36, compJanConv: 3.15, fhFebConv: 1.52, compFebConv: 3.72 },
+  { id: 3355, name: "FabHotel B Zone", city: "Chennai", compRns: 71.6, fhFebVisits: 690, compFebVisits: 1467.2, fhJanVisits: 13, compJanVisits: 135.67, fhJanRev: 10.57, compJanRev: 2.76, fhFebRev: 12.5, compFebRev: 3.68, fhJanConv: 0, compJanConv: 1.6, fhFebConv: 6.38, compFebConv: 3.52 },
+  { id: 3245, name: "Via The Adore Palace", city: "Mumbai", compRns: 106, fhFebVisits: 115, compFebVisits: 2826.17, fhJanVisits: 1212, compJanVisits: 834, fhJanRev: 2.04, compJanRev: 3.19, fhFebRev: 3.5, compFebRev: 7.04, fhJanConv: 7.01, compJanConv: 4.51, fhFebConv: 0, compFebConv: 2.17 },
+  { id: 3142, name: "FabHotel Step Inn", city: "Kolkata", compRns: 38, fhFebVisits: 303, compFebVisits: 320.2, fhJanVisits: 723, compJanVisits: 517, fhJanRev: 4.35, compJanRev: 1.01, fhFebRev: 2.04, compFebRev: 1.15, fhJanConv: 4.29, compJanConv: 4.87, fhFebConv: 11.22, compFebConv: 4.87 },
+  { id: 2937, name: "FabHotel Rr Grand - Next To Trendset Mall", city: "Vijayawada", compRns: 13, fhFebVisits: 232, compFebVisits: 193, fhJanVisits: 303, compJanVisits: 563.4, fhJanRev: 5.06, compJanRev: 0.81, fhFebRev: 2.98, compFebRev: 0.53, fhJanConv: 0.33, compJanConv: 0.21, fhFebConv: 4.31, compFebConv: 5.08 },
+  { id: 2667, name: "Via Hemkunt Residency", city: "Noida", compRns: 0.8, fhFebVisits: 114, compFebVisits: 375.6, fhJanVisits: 5497, compJanVisits: 2358.25, fhJanRev: 0.12, compJanRev: 0.00, fhFebRev: 0.4, compFebRev: 0.05, fhJanConv: 1.38, compJanConv: 2.26, fhFebConv: 1.75, compFebConv: 0.11 },
+];
+
+const pct = (a, b) => (b != null && b !== 0 && a != null) ? ((a / b) - 1) * 100 : null;
+
+// Enrich with derived fields
+const enriched = raw.map(d => ({
+  ...d,
+  fhRevChg: pct(d.fhFebRev, d.fhJanRev),
+  compRevChg: pct(d.compFebRev, d.compJanRev),
+  fhVisChg: pct(d.fhFebVisits, d.fhJanVisits),
+  compVisChg: pct(d.compFebVisits, d.compJanVisits),
+  fhConvChg: pct(d.fhFebConv, d.fhJanConv),
+  compConvChg: pct(d.compFebConv, d.compJanConv),
+})).map(d => ({
+  ...d,
+  netRevChg: d.fhRevChg != null && d.compRevChg != null ? d.fhRevChg - d.compRevChg : null,
+  netVisChg: d.fhVisChg != null && d.compVisChg != null ? d.fhVisChg - d.compVisChg : null,
+  netConvChg: d.fhConvChg != null && d.compConvChg != null ? d.fhConvChg - d.compConvChg : null,
+}));
+
+const cities = ["All", ...Array.from(new Set(raw.map(d => d.city))).sort()];
+
+const Badge = ({ val }) => {
+  if (val == null || isNaN(val)) return <span style={{ color: "#475569" }}>—</span>;
+  const pos = val >= 0;
+  return <span style={{ display: "inline-flex", alignItems: "center", gap: 2, padding: "2px 7px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: pos ? "#0d2e1e" : "#2d1010", color: pos ? "#34d399" : "#f87171", border: `1px solid ${pos ? "#065f46" : "#7f1d1d"}` }}>{pos ? "▲" : "▼"} {Math.abs(val).toFixed(1)}%</span>;
+};
+
+// All column definitions with key, label, color, grpColor, format
+const COLS = [
+  { k: "id", label: "FH ID", format: d => d.id, color: "#60a5fa" },
+  { k: "name", label: "Hotel", format: d => d.name, color: "#e2e8f0" },
+  { k: "city", label: "City", format: d => d.city },
+  { k: "fhJanRev", label: "FH Jan Rev (L)", format: d => d.fhJanRev?.toFixed(2) ?? "—", grp: "#34d399", color: "#34d399" },
+  { k: "fhFebRev", label: "FH Feb Rev (L)", format: d => d.fhFebRev?.toFixed(2) ?? "—", color: "#34d399" },
+  { k: "compJanRev", label: "Comp Jan Rev (L)", format: d => d.compJanRev?.toFixed(2) ?? "—" },
+  { k: "compFebRev", label: "Comp Feb Rev (L)", format: d => d.compFebRev?.toFixed(2) ?? "—" },
+  { k: "fhRevChg", label: "FH Chg%", format: d => <Badge val={d.fhRevChg} />, color: "#34d399", noFilter: true },
+  { k: "compRevChg", label: "Comp Chg%", format: d => <Badge val={d.compRevChg} />, noFilter: true },
+  { k: "netRevChg", label: "Net Chg%", format: d => <Badge val={d.netRevChg} />, color: "#34d399", noFilter: true },
+  { k: "fhJanVisits", label: "FH Jan Visits", format: d => d.fhJanVisits?.toLocaleString() ?? "—", grp: "#a78bfa", color: "#a78bfa" },
+  { k: "fhFebVisits", label: "FH Feb Visits", format: d => d.fhFebVisits?.toLocaleString() ?? "—", color: "#a78bfa" },
+  { k: "compJanVisits", label: "Comp Jan Visits", format: d => d.compJanVisits?.toLocaleString() ?? "—" },
+  { k: "compFebVisits", label: "Comp Feb Visits", format: d => d.compFebVisits?.toLocaleString() ?? "—" },
+  { k: "fhVisChg", label: "FH Chg%", format: d => <Badge val={d.fhVisChg} />, color: "#a78bfa", noFilter: true },
+  { k: "compVisChg", label: "Comp Chg%", format: d => <Badge val={d.compVisChg} />, noFilter: true },
+  { k: "netVisChg", label: "Net Chg%", format: d => <Badge val={d.netVisChg} />, color: "#a78bfa", noFilter: true },
+  { k: "fhJanConv", label: "FH Jan Conv%", format: d => d.fhJanConv?.toFixed(2) + "%" ?? "—", grp: "#fbbf24", color: "#fbbf24" },
+  { k: "fhFebConv", label: "FH Feb Conv%", format: d => d.fhFebConv?.toFixed(2) + "%" ?? "—", color: "#fbbf24" },
+  { k: "compJanConv", label: "Comp Jan Conv%", format: d => d.compJanConv?.toFixed(2) + "%" ?? "—" },
+  { k: "compFebConv", label: "Comp Feb Conv%", format: d => d.compFebConv?.toFixed(2) + "%" ?? "—" },
+  { k: "fhConvChg", label: "FH Chg%", format: d => <Badge val={d.fhConvChg} />, color: "#fbbf24", noFilter: true },
+  { k: "compConvChg", label: "Comp Chg%", format: d => <Badge val={d.compConvChg} />, noFilter: true },
+  { k: "netConvChg", label: "Net Chg%", format: d => <Badge val={d.netConvChg} />, color: "#fbbf24", noFilter: true },
+];
+
+const CITY_COLS = [
+  { k: "city", label: "City", format: d => d.city, color: "#38bdf8" },
+  { k: "count", label: "Props", format: d => d.count },
+  { k: "fhJanRev", label: "FH Jan Rev (L)", format: d => d.fhJanRev?.toFixed(2), grp: "#34d399", color: "#34d399" },
+  { k: "fhFebRev", label: "FH Feb Rev (L)", format: d => d.fhFebRev?.toFixed(2), color: "#34d399" },
+  { k: "compJanRev", label: "Comp Jan Rev (L)", format: d => d.compJanRev?.toFixed(2) },
+  { k: "compFebRev", label: "Comp Feb Rev (L)", format: d => d.compFebRev?.toFixed(2) },
+  { k: "fhRevChg", label: "FH Chg%", format: d => <Badge val={d.fhRevChg} />, color: "#34d399", noFilter: true },
+  { k: "compRevChg", label: "Comp Chg%", format: d => <Badge val={d.compRevChg} />, noFilter: true },
+  { k: "netRevChg", label: "Net Chg%", format: d => <Badge val={d.netRevChg} />, color: "#34d399", noFilter: true },
+  { k: "fhJanVisits", label: "FH Jan Visits", format: d => d.fhJanVisits?.toLocaleString(), grp: "#a78bfa", color: "#a78bfa" },
+  { k: "fhFebVisits", label: "FH Feb Visits", format: d => d.fhFebVisits?.toLocaleString(), color: "#a78bfa" },
+  { k: "compJanVisits", label: "Comp Jan Visits", format: d => d.compJanVisits?.toLocaleString() },
+  { k: "compFebVisits", label: "Comp Feb Visits", format: d => d.compFebVisits?.toLocaleString() },
+  { k: "fhVisChg", label: "FH Chg%", format: d => <Badge val={d.fhVisChg} />, color: "#a78bfa", noFilter: true },
+  { k: "compVisChg", label: "Comp Chg%", format: d => <Badge val={d.compVisChg} />, noFilter: true },
+  { k: "netVisChg", label: "Net Chg%", format: d => <Badge val={d.netVisChg} />, color: "#a78bfa", noFilter: true },
+  { k: "fhJanConv", label: "FH Jan Conv%", format: d => d.fhJanConv?.toFixed(2) + "%", grp: "#fbbf24", color: "#fbbf24" },
+  { k: "fhFebConv", label: "FH Feb Conv%", format: d => d.fhFebConv?.toFixed(2) + "%", color: "#fbbf24" },
+  { k: "compJanConv", label: "Comp Jan Conv%", format: d => d.compJanConv?.toFixed(2) + "%" },
+  { k: "compFebConv", label: "Comp Feb Conv%", format: d => d.compFebConv?.toFixed(2) + "%" },
+  { k: "fhConvChg", label: "FH Chg%", format: d => <Badge val={d.fhConvChg} />, color: "#fbbf24", noFilter: true },
+  { k: "compConvChg", label: "Comp Chg%", format: d => <Badge val={d.compConvChg} />, noFilter: true },
+  { k: "netConvChg", label: "Net Chg%", format: d => <Badge val={d.netConvChg} />, color: "#fbbf24", noFilter: true },
+];
+
+export default function Dashboard() {
+  const [search, setSearch] = useState("");
+  const [cityFilter, setCityFilter] = useState("All");
+  const [cityView, setCityView] = useState(false);
+  const [sortKey, setSortKey] = useState("id");
+  const [sortDir, setSortDir] = useState("asc");
+  const [menuCol, setMenuCol] = useState(null);
+  const [colFilters, setColFilters] = useState({}); // { colKey: Set of selected values }
+  const menuRef = useRef(null);
+  const [filterSearch, setFilterSearch] = useState({});
+
+  useEffect(() => {
+    const handler = e => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuCol(null);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const cityRows = useMemo(() => {
+    const map = {};
+    enriched.forEach(d => {
+      if (!map[d.city]) map[d.city] = { city: d.city, count: 0, fhFebRev: 0, compFebRev: 0, fhJanRev: 0, compJanRev: 0, fhFebVisits: 0, compFebVisits: 0, fhJanVisits: 0, compJanVisits: 0, fhJanConv: 0, fhFebConv: 0, compJanConv: 0, compFebConv: 0 };
+      const r = map[d.city]; r.count++;
+      r.fhFebRev += d.fhFebRev || 0; r.compFebRev += d.compFebRev || 0;
+      r.fhJanRev += d.fhJanRev || 0; r.compJanRev += d.compJanRev || 0;
+      r.fhFebVisits += d.fhFebVisits || 0; r.compFebVisits += d.compFebVisits || 0;
+      r.fhJanVisits += d.fhJanVisits || 0; r.compJanVisits += d.compJanVisits || 0;
+      r.fhJanConv += d.fhJanConv || 0; r.fhFebConv += d.fhFebConv || 0;
+      r.compJanConv += d.compJanConv || 0; r.compFebConv += d.compFebConv || 0;
+    });
+    return Object.values(map).map(r => {
+      const fhRevChg = pct(r.fhFebRev, r.fhJanRev), compRevChg = pct(r.compFebRev, r.compJanRev);
+      const fhVisChg = pct(r.fhFebVisits, r.fhJanVisits), compVisChg = pct(r.compFebVisits, r.compJanVisits);
+      const n = r.count;
+      r.fhJanConv /= n; r.fhFebConv /= n; r.compJanConv /= n; r.compFebConv /= n;
+      const fhConvChg = pct(r.fhFebConv, r.fhJanConv), compConvChg = pct(r.compFebConv, r.compJanConv);
+      return { ...r, fhRevChg, compRevChg, netRevChg: fhRevChg != null && compRevChg != null ? fhRevChg - compRevChg : null, fhVisChg, compVisChg, netVisChg: fhVisChg != null && compVisChg != null ? fhVisChg - compVisChg : null, fhConvChg, compConvChg, netConvChg: fhConvChg != null && compConvChg != null ? fhConvChg - compConvChg : null };
+    });
+  }, []);
+
+  const cols = cityView ? CITY_COLS : COLS;
+
+  // Get unique string values for a column across base data
+  const getColValues = (k) => {
+    const src = cityView ? cityRows : enriched;
+    const vals = new Set(src.map(d => {
+      const v = d[k];
+      return v == null ? "—" : String(typeof v === "number" ? (Number.isInteger(v) ? v : parseFloat(v.toFixed(2))) : v);
+    }));
+    return Array.from(vals).sort((a, b) => {
+      const na = parseFloat(a), nb = parseFloat(b);
+      return isNaN(na) || isNaN(nb) ? a.localeCompare(b) : na - nb;
+    });
+  };
+
+  const baseSource = useMemo(() => {
+    if (cityView) return cityRows;
+    return enriched.filter(d => {
+      const q = search.toLowerCase();
+      return (!q || d.name?.toLowerCase().includes(q) || d.city.toLowerCase().includes(q) || String(d.id).includes(q))
+        && (cityFilter === "All" || d.city === cityFilter);
+    });
+  }, [cityView, cityRows, search, cityFilter]);
+
+  const filtered = useMemo(() => {
+    let rows = baseSource.filter(d => {
+      for (const [k, sel] of Object.entries(colFilters)) {
+        if (!sel || sel.size === 0) continue;
+        const v = d[k];
+        const str = v == null ? "—" : String(typeof v === "number" ? (Number.isInteger(v) ? v : parseFloat(v.toFixed(2))) : v);
+        if (!sel.has(str)) return false;
+      }
+      return true;
+    });
+    return [...rows].sort((a, b) => {
+      let av = a[sortKey] ?? -Infinity, bv = b[sortKey] ?? -Infinity;
+      if (typeof av === "string") { av = av.toLowerCase(); bv = bv.toLowerCase(); }
+      return sortDir === "asc" ? (av > bv ? 1 : -1) : (av < bv ? 1 : -1);
+    });
+  }, [baseSource, colFilters, sortKey, sortDir]);
+
+  const cityFiltered = useMemo(() => cityFilter === "All" ? enriched : enriched.filter(d => d.city === cityFilter), [cityFilter]);
+
+  const kpis = useMemo(() => {
+    const src = cityFiltered;
+    const fhRev = src.reduce((s, d) => s + (d.fhFebRev || 0), 0);
+    const compRev = src.reduce((s, d) => s + (d.compFebRev || 0), 0);
+    const fhVis = src.reduce((s, d) => s + (d.fhFebVisits || 0), 0);
+    const compVis = src.reduce((s, d) => s + (d.compFebVisits || 0), 0);
+    const fhConv = src.length ? src.reduce((s, d) => s + (d.fhFebConv || 0), 0) / src.length : 0;
+    const compConv = src.length ? src.reduce((s, d) => s + (d.compFebConv || 0), 0) / src.length : 0;
+    return [
+      { label: "FH Feb Revenue", value: "₹" + fhRev.toFixed(2) + "L", pct: compRev ? ((fhRev - compRev) / compRev) * 100 : null, color: "#34d399" },
+      { label: "Total FH Visits", value: fhVis.toLocaleString(), pct: compVis ? ((fhVis - compVis) / compVis) * 100 : null, color: "#a78bfa" },
+      { label: "Avg. FH Conv.", value: fhConv.toFixed(2) + "%", pct: compConv ? ((fhConv - compConv) / compConv) * 100 : null, color: "#fbbf24" },
+    ];
+  }, [cityFiltered]);
+
+  const toggleFilter = (k, val) => {
+    setColFilters(prev => {
+      const cur = new Set(prev[k] || []);
+      cur.has(val) ? cur.delete(val) : cur.add(val);
+      return { ...prev, [k]: cur };
+    });
+  };
+
+  const clearFilter = (k) => setColFilters(prev => ({ ...prev, [k]: new Set() }));
+  const selectAll = (k) => setColFilters(prev => ({ ...prev, [k]: new Set(getColValues(k)) }));
+  const activeFilters = Object.values(colFilters).filter(s => s && s.size > 0).length;
+
+  const ColHeader = ({ col }) => {
+    const { k, label, color, grp } = col;
+    const isActive = sortKey === k;
+    const isMenuOpen = menuCol === k;
+    const hasFilter = colFilters[k] && colFilters[k].size > 0;
+    const allVals = getColValues(k);
+    const fSearch = filterSearch[k] || "";
+    const visibleVals = fSearch ? allVals.filter(v => v.toLowerCase().includes(fSearch.toLowerCase())) : allVals;
+    const sel = colFilters[k] || new Set();
+
+    return (
+      <th style={{ padding: "10px 10px", textAlign: "left", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap", background: "#0f1422", position: "relative", ...(grp ? { borderLeft: `2px solid ${grp}55` } : {}) }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+          <span style={{ color: isActive ? (color || "#60a5fa") : (color || "#475569") }}>{label}</span>
+          <span onClick={e => { e.stopPropagation(); setMenuCol(isMenuOpen ? null : k); setFilterSearch(p => ({ ...p, [k]: "" })); }}
+            style={{ cursor: "pointer", fontSize: 11, padding: "1px 4px", borderRadius: 4, background: isMenuOpen ? "#1a2840" : hasFilter ? "#1a2840" : "transparent", color: hasFilter ? "#60a5fa" : isMenuOpen ? "#94a3b8" : "#334155", border: hasFilter ? "1px solid #3b82f655" : "1px solid transparent" }}>
+            {hasFilter ? "▼●" : "▼"}
+          </span>
+        </div>
+
+        {isMenuOpen && (
+          <div ref={menuRef} onClick={e => e.stopPropagation()}
+            style={{ position: "absolute", top: "100%", left: 0, zIndex: 100, background: "#161d30", border: "1px solid #1e2840", borderRadius: 10, width: 200, boxShadow: "0 10px 30px rgba(0,0,0,0.6)", overflow: "hidden" }}>
+
+            {/* Sort options */}
+            <div style={{ borderBottom: "1px solid #1e2840", padding: "4px 0" }}>
+              {[["asc","↑ Sort A to Z"],["desc","↓ Sort Z to A"]].map(([dir, lbl]) => (
+                <div key={dir} onClick={() => { setSortKey(k); setSortDir(dir); }}
+                  style={{ padding: "8px 14px", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, color: sortKey === k && sortDir === dir ? "#60a5fa" : "#94a3b8", background: sortKey === k && sortDir === dir ? "#1a2840" : "transparent" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#1e2640"}
+                  onMouseLeave={e => e.currentTarget.style.background = sortKey === k && sortDir === dir ? "#1a2840" : "transparent"}>
+                  {lbl}
+                </div>
+              ))}
+            </div>
+
+            {/* Filter section */}
+            {!col.noFilter && (
+              <div>
+                <div style={{ padding: "8px 10px", borderBottom: "1px solid #1e2840" }}>
+                  <input value={fSearch} onChange={e => setFilterSearch(p => ({ ...p, [k]: e.target.value }))}
+                    placeholder="Search values..." onClick={e => e.stopPropagation()}
+                    style={{ width: "100%", background: "#0b0e18", border: "1px solid #1e2840", borderRadius: 6, padding: "5px 8px", color: "#e2e8f0", fontSize: 11, outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div style={{ display: "flex", gap: 6, padding: "6px 10px", borderBottom: "1px solid #1e2840" }}>
+                  <span onClick={() => selectAll(k)} style={{ fontSize: 10, color: "#60a5fa", cursor: "pointer" }}>Select All</span>
+                  <span style={{ color: "#334155" }}>|</span>
+                  <span onClick={() => clearFilter(k)} style={{ fontSize: 10, color: "#f87171", cursor: "pointer" }}>Clear</span>
+                </div>
+                <div style={{ maxHeight: 180, overflowY: "auto" }}>
+                  {visibleVals.map(v => (
+                    <label key={v} onClick={e => e.stopPropagation()} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", cursor: "pointer", fontSize: 11, color: sel.has(v) ? "#e2e8f0" : "#94a3b8" }}
+                      onMouseEnter={e => e.currentTarget.style.background = "#1e2640"}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <input type="checkbox" checked={sel.has(v)} onChange={() => toggleFilter(k, v)}
+                        style={{ accentColor: "#3b82f6", width: 13, height: 13 }} />
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 140 }}>{v}</span>
+                    </label>
+                  ))}
+                  {visibleVals.length === 0 && <div style={{ padding: "10px 12px", fontSize: 11, color: "#475569" }}>No values</div>}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </th>
+    );
+  };
+
+  const Btn = ({ active, onClick, label, color = "#94a3b8" }) => (
+    <button onClick={onClick} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid", fontSize: 13, cursor: "pointer", background: active ? color + "22" : "#0b0e18", borderColor: active ? color : "#1a2035", color: active ? color : "#64748b", fontWeight: active ? 700 : 400, transition: "all 0.15s" }}>{label}</button>
+  );
+
+  const cell = { padding: "11px 12px", color: "#94a3b8", whiteSpace: "nowrap", fontSize: 12 };
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#0b0e18", color: "#cbd5e1", fontFamily: "system-ui, sans-serif" }} onClick={() => setMenuCol(null)}>
+      {/* Nav */}
+      <div style={{ background: "#0f1422", borderBottom: "1px solid #1a2035", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 30, height: 30, borderRadius: 7, background: "linear-gradient(135deg,#f97316,#ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, color: "#fff" }}>F</div>
+          <span style={{ fontWeight: 700, fontSize: 17, color: "#f1f5f9" }}>FabHotel Dashboard</span>
+        </div>
+        <span style={{ fontSize: 12, color: "#475569" }}>Feb 2026 · {raw.length} Properties</span>
+      </div>
+
+      <div style={{ padding: "24px 28px" }}>
+        {/* Controls */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 20, alignItems: "center", flexWrap: "wrap" }}>
+          <Btn active={!cityView} onClick={() => { setCityView(false); setSortKey("id"); setSortDir("asc"); setColFilters({}); }} label="Property View" color="#94a3b8" />
+          <Btn active={cityView} onClick={() => { setCityView(true); setSortKey("city"); setSortDir("asc"); setCityFilter("All"); setColFilters({}); }} label="City Level" color="#38bdf8" />
+          {activeFilters > 0 && (
+            <button onClick={() => setColFilters({})} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid #f8717155", fontSize: 12, cursor: "pointer", background: "#2d101022", color: "#f87171" }}>
+              ✕ Clear {activeFilters} filter{activeFilters > 1 ? "s" : ""}
+            </button>
+          )}
+        </div>
+
+        {/* KPIs */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 24 }}>
+          {kpis.map((k, i) => (
+            <div key={i} style={{ background: "#0f1422", border: `1px solid ${k.color}44`, borderRadius: 12, padding: "18px 24px" }}>
+              <div style={{ fontSize: 11, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>{k.label}</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: k.color, marginBottom: 8 }}>{k.value}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}><Badge val={k.pct} /><span style={{ fontSize: 11, color: "#334155" }}>vs Comp</span></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Table */}
+        <div style={{ background: "#0f1422", border: "1px solid #1a2035", borderRadius: 12, overflow: "hidden" }}>
+          {!cityView && (
+            <div style={{ padding: "14px 20px", borderBottom: "1px solid #1a2035", display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search hotel, city, ID..."
+                style={{ flex: 1, minWidth: 180, background: "#0b0e18", border: "1px solid #1a2035", borderRadius: 7, padding: "7px 12px", color: "#e2e8f0", fontSize: 13, outline: "none" }} />
+              <select value={cityFilter} onChange={e => setCityFilter(e.target.value)}
+                style={{ background: "#0b0e18", border: "1px solid #1a2035", borderRadius: 7, padding: "7px 10px", color: "#94a3b8", fontSize: 13, cursor: "pointer" }}>
+                {cities.map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+          )}
+
+          {/* Legend */}
+          <div style={{ display: "flex", gap: 20, padding: "10px 20px", borderBottom: "1px solid #1a2035" }}>
+            {[["#34d399","Revenue"],["#a78bfa","Visits"],["#fbbf24","Conversion"]].map(([c,l]) => (
+              <div key={l} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <div style={{ width: 10, height: 10, borderRadius: 2, background: c }} />
+                <span style={{ fontSize: 11, color: "#64748b" }}>{l}</span>
+              </div>
+            ))}
+            <span style={{ marginLeft: "auto", fontSize: 11, color: "#475569" }}>Click ▼ on any column to sort or filter</span>
+          </div>
+
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid #1a2035" }}>
+                  {cols.map(col => <ColHeader key={col.k} col={col} />)}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((d, i) => {
+                  const bg = i % 2 !== 0 ? "#0d1020" : "transparent";
+                  return (
+                    <tr key={cityView ? d.city : d.id} style={{ borderBottom: "1px solid #111827", background: bg }}
+                      onMouseEnter={e => e.currentTarget.style.background = "#151b2e"}
+                      onMouseLeave={e => e.currentTarget.style.background = bg}>
+                      {cols.map(col => {
+                        const val = col.format(d);
+                        return (
+                          <td key={col.k} style={{ ...cell, ...(col.grp ? { borderLeft: `2px solid ${col.grp}55` } : {}), ...(col.color && typeof val !== "object" ? { color: col.color, fontWeight: 600 } : {}) }}>
+                            {val}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={cols.length} style={{ padding: 40, textAlign: "center", color: "#334155" }}>No data matches your filters.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div style={{ padding: "12px 20px", borderTop: "1px solid #1a2035", fontSize: 12, color: "#334155", display: "flex", justifyContent: "space-between" }}>
+            <span>{cityView ? `${filtered.length} cities` : `Showing ${filtered.length} of ${raw.length} properties`}</span>
+            {activeFilters > 0 && <span style={{ color: "#60a5fa" }}>{activeFilters} column filter{activeFilters > 1 ? "s" : ""} active</span>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
